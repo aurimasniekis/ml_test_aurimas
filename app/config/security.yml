@@ -1,0 +1,32 @@
+security:
+    providers:
+        users:
+            id: aurimas_user.user.provider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        secured_area:
+            pattern:    ^/
+            anonymous: ~
+            form_login:
+                check_path: _security_check
+                login_path: _demo_login
+            logout:
+                path:   aurimas_user_logout
+                target: aurimas_repositories_homepage
+            oauth:
+                resource_owners:
+                    github: "/login/check-github"
+                login_path: /login
+                use_forward: false
+                failure_path: /login
+                oauth_user_provider:
+                    service: aurimas_user.user.provider
+
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/connect, roles: [ROLE_USER, IS_AUTHENTICATED_ANONYMOUSLY]}
+        - { path: ^/, roles: ROLE_USER }

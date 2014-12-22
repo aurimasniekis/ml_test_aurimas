@@ -1,0 +1,245 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}{{ repository.full_name }} - {{ issue.title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/timeline.css') }}" media="screen"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="application/javascript" src="{{ asset('js/jquery.timeago.js') }}"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $("time.timeago").timeago();
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt20">
+    <div class="page-header">
+        <h1><a href="{{ repository.html_url }}">{{ repository.full_name }}</a><br/>
+            <small>{{ repository.description }}</small>
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li><a href="{{ url('aurimas_repositories_homepage') }}">{{ "Repositories"|trans }}</a></li>
+                <li>
+                    <a href="{{ url('aurimas_issues_list', {owner: repository.owner.login, name: repository.name}) }}">{{ repository.full_name }}</a>
+                </li>
+                <li class="class">{{ issue.title }} #{{ issue.number }}</li>
+            </ol>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group pull-right" role="group" aria-label="...">
+                <a class="btn btn-default edit-issue" href="#">Edit</a>
+                {% if issue.state != 'closed' %}
+                    <a class="btn btn-danger close-issue"
+                       href="{{ url('aurimas_issue_close', {owner: repository.owner.login, name: repository.name, id: issue.number}) }}">Close</a>
+                {% endif %}
+                <a class="btn btn-success"
+                   href="{{ url('aurimas_issue_new', {owner: repository.owner.login, name: repository.name}) }}">New
+                    issue</a>
+            </div>
+
+        </div>
+    </div>
+    <div class="row mt20">
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% if issue.state == 'open' %}
+                        {% set label_color = 'label-success' %}
+                    {% else %}
+                        {% set label_color = 'label-default' %}
+                    {% endif %}
+                    <h2 class="nomg">{{ issue.title }} <span style="color: #777">#{{ issue.number }}</span></h2>
+                    <span class="label {{ label_color }}">{{ issue.state|trans }}</span>
+                    <strong>{{ issue.user.login }}</strong> {{ issue.state|trans ~ " this issue"|trans }}
+                    <time class="timeago" datetime="{{ issue.created_at }}">{{ issue.created_at }}</time>
+                    · {{ issue.comments }} {{ "comments"|trans }}
+                </div>
+            </div>
+            <div class="panel panel-default issue-edit-box">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        {{ issue.user.login }}
+                        <small>
+                            <time class="timeago" datetime="{{ issue.created_at }}">{{ issue.created_at }}</time>
+                        </small>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    {{ issue.body }}
+                </div>
+
+                <div class="panel-body edit">
+                    {{ form_start(issueEditForm, {attr: {role: 'form' }}) }}
+                    <div class="form-group">
+                        {{ form_widget(issueEditForm.title, {attr: {class: 'form-control', rows: 5 }}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(issueEditForm.body, {attr: {class: 'form-control', rows: 5 }}) }}
+                    </div>
+                    {{ form_widget(issueEditForm.submit, {attr: {class: 'btn btn-success' }}) }}
+                    {{ form_widget(issueEditForm.cancel, {attr: {class: 'btn btn-danger commnent-close' }}) }}
+                    {{ form_end(issueEditForm) }}
+                </div>
+            </div>
+
+            {% set last_item_type = 'none' %}
+            {% for item in items %}
+                {% if item.type == 'event' %}
+                    {% if last_item_type != 'event' %}
+                        <ul class="timeline">
+                    {% endif %}
+                    {% set event = item.item %}
+                    {% if event.event == 'closed' %}
+                        {% set event_icon = 'glyphicon glyphicon-ban-circle' %}
+                        {% set event_title = 'closed this' %}
+                        {% set event_color = 'danger' %}
+                    {% elseif event.event == 'reopened' %}
+                        {% set event_icon = 'glyphicon glyphicon-repeat' %}
+                        {% set event_title = 'reopened this' %}
+                        {% set event_color = 'warning' %}
+                    {% elseif event.event == 'subscribed' %}
+                        {% set event_icon = 'glyphicon glyphicon-eye-open' %}
+                        {% set event_title = 'subscribed to this issue' %}
+                        {% set event_color = 'default' %}
+                    {% elseif event.event == 'assigned' %}
+                        {% set event_icon = 'glyphicon glyphicon-user' %}
+                        {% set event_title = 'assigned <strong>' ~ event.assignee.login ~ '</strong> to this issue' %}
+                        {% set event_color = 'success' %}
+                    {% elseif event.event == 'unassigned' %}
+                        {% set event_icon = 'glyphicon glyphicon-user' %}
+                        {% set event_title = 'removed <strong>' ~ event.assignee.login ~ '</strong> assigment from this issue' %}
+                        {% set event_color = 'danger' %}
+                    {% elseif event.event == 'labeled' %}
+                        {% set event_icon = 'glyphicon glyphicon-barcode' %}
+                        {% set event_title = 'added <span style="font-weight: bold; color: #' ~ event.label.color ~ '">' ~ event.label.name ~ '</span> label' %}
+                        {% set event_color = 'success' %}
+                    {% elseif event.event == 'unlabeled' %}
+                        {% set event_icon = 'glyphicon glyphicon-barcode' %}
+                        {% set event_title = 'removed <span style="font-weight: bold; color: #' ~ event.label.color ~ '">' ~ event.label.name ~ '</span> label' %}
+                        {% set event_color = 'danger' %}
+                    {% else %}
+                        {% set event_icon = '' %}
+                    {% endif %}
+                    {% if event_icon != '' %}
+                        <li class="timeline-inverted">
+                            <div class="timeline-badge {{ event_color }}"><i class="{{ event_icon }}"></i></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-body">
+                                    <strong>{{ event.actor.login }}</strong> {{ event_title|raw }}
+                                    <small>
+                                        <time class="timeago"
+                                              datetime="{{ event.created_at }}">{{ event.created_at }}</time>
+                                    </small>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% set last_item_type = 'event' %}
+                {% elseif item.type == 'comment' %}
+                    {% if last_item_type == 'event' %}
+                        </ul>
+                    {% endif %}
+                    {% set comment = item.item %}
+                    <div class="mt20 panel panel-default comment-box">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                {{ comment.user.login }}
+                                <small>
+                                    <time class="timeago"
+                                          datetime="{{ comment.created_at }}">{{ comment.created_at }}</time>
+                                </small>
+                                    <span class="pull-right"><a href="#" class="edit"><i
+                                                    class="glyphicon glyphicon-edit"></i></a></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            {{ comment.body }}
+                        </div>
+                        <div class="panel-body edit">
+                            {{ form_start(item.form, {attr: {role: 'form' }}) }}
+                            <div class="form-group">
+                                {{ form_widget(item.form.body, {attr: {class: 'form-control', rows: 5 }}) }}
+                            </div>
+                            {{ form_widget(item.form.submit, {attr: {class: 'btn btn-success' }}) }}
+                            {{ form_widget(item.form.cancel, {attr: {class: 'btn btn-danger commnent-close' }}) }}
+                            {{ form_end(item.form) }}
+                        </div>
+                    </div>
+                    {% set last_item_type = 'comment' %}
+                {% endif %}
+            {% endfor %}
+            {% if last_item_type == 'event' %}
+                </ul>
+                {% endif %}
+            <div class="mt20 panel panel-default new-comment-box">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        New Comment
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(newCommentForm, {attr: {role: 'form' }}) }}
+                    <div class="form-group">
+                        {{ form_widget(newCommentForm.body, {attr: {class: 'form-control', rows: 5 }}) }}
+                    </div>
+                    {{ form_widget(newCommentForm.submit, {attr: {class: 'btn btn-success' }}) }}
+                    {{ form_end(newCommentForm) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ "Labels"|trans }}</h3>
+                </div>
+
+                <ul class="list-group">
+                    {% for label in issue.labels %}
+                        <li class="list-group-item"
+                            style="color: #fff; font-weight: bold; background-color: #{{ label.color }}">{{ label.name }}</li>
+                    {% else %}
+                        <li class="list-group-item">{{ "None yet"|trans }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ "Milestone"|trans }}</h3>
+                </div>
+
+                <ul class="list-group">
+                    {% if issue.milestone %}
+                        <li class="list-group-item">{{ issue.milestone.title }}</li>
+                    {% else %}
+                        <li class="list-group-item">{{ "No milestone"|trans }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ "Assignee"|trans }}</h3>
+                </div>
+
+                <ul class="list-group">
+                    {% if issue.assignee %}
+                        <li class="list-group-item">{{ issue.assignee.login }}</li>
+                    {% else %}
+                        <li class="list-group-item">{{ "No one assigned"|trans }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}

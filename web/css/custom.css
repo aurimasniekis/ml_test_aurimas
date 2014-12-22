@@ -1,0 +1,12 @@
+.mt20 {
+    margin-top: 20px;
+}
+
+.nomg {
+    margin: 0;
+}
+
+.comment-box > .panel-body.edit,
+.issue-edit-box > .panel-body.edit{
+    display: none;
+}

@@ -1,0 +1,11 @@
+aurimas_issues:
+    resource: "@AurimasIssuesBundle/Resources/config/routing.xml"
+    prefix:   /
+
+aurimas_repositories:
+    resource: "@AurimasRepositoriesBundle/Resources/config/routing.xml"
+    prefix:   /
+
+aurimas_user:
+    resource: "@AurimasUserBundle/Resources/config/routing.xml"
+    prefix:   /

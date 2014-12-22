@@ -1,0 +1,32 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div class="container mt20">
+        <div class="page-header">
+            <h1>GitHub "{{ app.user.username }}" issues CRUD</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li class="active">{{ "Repositories"|trans }}</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="list-group">
+                    {% for repo in repositories %}
+                        <a href="{{ url('aurimas_issues_list', {owner: repo.owner.login, name: repo.name}) }}"
+                           class="list-group-item">
+                            <span class="alert-warning badge">{{ stats[repo.id].closed }}</span>
+                            <span class="alert-success badge">{{ stats[repo.id].open }}</span>
+                            <h4 class="list-group-item-heading">{{ repo.full_name }}</h4>
+
+                            <p class="list-group-item-text">{{ repo.description }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

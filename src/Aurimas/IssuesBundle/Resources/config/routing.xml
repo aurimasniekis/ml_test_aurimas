@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="aurimas_issues_list" path="/repository/{owner}/{name}">
+        <default key="_controller">AurimasIssuesBundle:Default:index</default>
+    </route>
+
+    <route id="aurimas_issue_show" path="/repository/{owner}/{name}/{id}">
+        <default key="_controller">AurimasIssuesBundle:Default:show</default>
+    </route>
+
+    <route id="aurimas_issue_update" path="/repository/{owner}/{name}/{id}/edit">
+        <default key="_controller">AurimasIssuesBundle:Default:update</default>
+    </route>
+
+    <route id="aurimas_issue_close" path="/repository/{owner}/{name}/{id}/close">
+        <default key="_controller">AurimasIssuesBundle:Default:close</default>
+    </route>
+
+    <route id="aurimas_issue_new" path="/repository/{owner}/{name}/new/">
+        <default key="_controller">AurimasIssuesBundle:Default:new</default>
+    </route>
+
+    <route id="aurimas_issue_create" path="/repository/{owner}/{name}/create/">
+        <default key="_controller">AurimasIssuesBundle:Default:create</default>
+    </route>
+
+    <route id="aurimas_issue_comments_update" path="/repository/{owner}/{name}/{issue}/comments/{id}/edit">
+        <default key="_controller">AurimasIssuesBundle:Comment:update</default>
+    </route>
+
+    <route id="aurimas_issue_comments_new" path="/repository/{owner}/{name}/{issue}/comments/new">
+        <default key="_controller">AurimasIssuesBundle:Comment:create</default>
+    </route>
+</routes>

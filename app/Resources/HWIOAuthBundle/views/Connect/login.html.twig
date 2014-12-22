@@ -1,0 +1,22 @@
+{% extends "::base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="site-wrapper">
+        <div class="site-wrapper-inner">
+            <div class="cover-container">
+                <div class="inner cover">
+                    <h1 class="cover-heading">Login using GitHub</h1>
+                    <p class="leed"></p>
+                    <p class="lead">
+                        <a href="{{ hwi_oauth_login_url('github') }}" class="btn btn-lg btn-default">Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

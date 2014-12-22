@@ -1,0 +1,47 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}{{ repository.full_name }}{% endblock %}
+
+{% block body %}
+    <div class="container mt20">
+        <div class="page-header">
+            <h1><a href="{{ repository.html_url }}">{{ repository.full_name }}</a><br/>
+                <small>{{ repository.description }}</small>
+            </h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="{{ url('aurimas_repositories_homepage') }}">{{ "Repositories"|trans }}</a></li>
+                    <li class="active">{{ repository.full_name }}</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-success pull-right"
+                   href="{{ url('aurimas_issue_new', {owner: repository.owner.login, name: repository.name}) }}">New
+                    issue</a>
+            </div>
+        </div>
+        <div class="row mt20">
+            <div class="col-md-12">
+                <div class="list-group">
+                    {% for issue in issues %}
+                        {% if issue.state == 'open' %}
+                            {% set label_color = 'label-success' %}
+                        {% else %}
+                            {% set label_color = 'label-default' %}
+                        {% endif %}
+                        <a href="{{ url('aurimas_issue_show', {owner: repository.owner.login, name: repository.name, id: issue.number}) }}"
+                           class="list-group-item">
+                            <span class="badge">{{ issue.comments }}</span>
+                            <h4 class="list-group-item-heading">{{ issue.title }} <span
+                                        class="label {{ label_color }}">{{ issue.state|trans }}</span></h4>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

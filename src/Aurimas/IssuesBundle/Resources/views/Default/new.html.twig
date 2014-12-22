@@ -1,0 +1,47 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}{{ repository.full_name }} - {{ "New issue"|trans }}{% endblock %}
+
+{% block body %}
+    <div class="container mt20">
+        <div class="page-header">
+            <h1><a href="{{ repository.html_url }}">{{ repository.full_name }}</a><br/>
+                <small>{{ repository.description }}</small>
+            </h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="{{ url('aurimas_repositories_homepage') }}">{{ "Repositories"|trans }}</a></li>
+                    <li>
+                        <a href="{{ url('aurimas_issues_list', {owner: repository.owner.login, name: repository.name}) }}">{{ repository.full_name }}</a>
+                    </li>
+                    <li class="class">{{ "New issue"|trans }}</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row mt20">
+            <div class="col-md-12">
+                <div class="panel panel-default issue-edit-box">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            {{ "New issue"|trans }}
+                        </h3>
+                    </div>
+
+                    <div class="panel-body">
+                        {{ form_start(form, {attr: {role: 'form' }}) }}
+                        <div class="form-group">
+                            {{ form_widget(form.title, {attr: {class: 'form-control', rows: 5 }}) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(form.body, {attr: {class: 'form-control', rows: 5 }}) }}
+                        </div>
+                        {{ form_widget(form.submit, {attr: {class: 'btn btn-success' }}) }}
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
